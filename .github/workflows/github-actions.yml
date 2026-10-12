@@ -45,6 +45,10 @@ jobs:
               exit 0
             fi
             
+            # Explicitly construct the repo path inside the runner session context
+            export GIT_REPO="https://github.com{{ github.repository }}.git"
+            
+            # For PRs from forks, use the fork repository; otherwise use the main repo
             if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
               export GIT_REPO="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY_OWNER}/${GITHUB_REPOSITORY##*/}.git"
               export BRANCH="${GITHUB_HEAD_REF}"
@@ -60,12 +64,14 @@ jobs:
               fi
             fi
 
+            echo "Executing clone command against: $GIT_REPO"
             if git clone --depth 1 --branch "${TAG:-$BRANCH}" "$GIT_REPO"; then
                 echo "Code fetched successfully."
             else
                 echo "Failed to fetch code. Check the repository and settings."
                 exit 1
             fi
+
         - name: "Set version"
           if: matrix.cfg.skip == false
           run: |
