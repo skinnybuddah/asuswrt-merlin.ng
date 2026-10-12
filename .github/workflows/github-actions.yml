@@ -94,3 +94,10 @@ jobs:
                     cp "$f.md5" "${ARTIFACTS_DIR}"
                 fi
             done
+        - name: "Upload Firmware Image to GitHub UI"
+          if: matrix.cfg.skip == false
+          uses: actions/upload-artifact@v4
+          with:
+            name: "Custom-Merlin-DSL-AX82U"
+            path: "/project/artifacts/*"
+            if-no-files-found: error
